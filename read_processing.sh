@@ -48,3 +48,6 @@ done
 for i in {4..39};
 do samtools sort -@24 -o bb${i}q10_4srt.bam bb${i}q10_4.bam -O bam -T temp && samtools index -@24 bb${i}q10_4srt.bam;
 done
+
+# Quality control with bamqc
+
