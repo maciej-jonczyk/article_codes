@@ -17,6 +17,8 @@ for i in {34..39};
 do ~/bin/bbmap/bbduk.sh -in=/home/mj/mybookliveduo/dane_old/HDS-34-39/data/170303_SND393_B_L007_HDS-${i}_R1.fastq.gz ref=~/bin/bbmap/resources/truseq.fa.gz,artifacts,phix ktrim=r k=23 mink=11 hdist=1 tbo tpe qtrim=r trimq=10 out=hds${i}_clean.fastq.gz ;
 done
 
+# TO BEDZIE TRZEBA ZMIENIC, ZEBY POKAZAC TYLKO MAPOWANIE KONTROLNYCH!
+
 # Quality control, as in step 1.
 
 # Genome indexing. bbmap script from the bbmap suite. Maize genome version 4 (Zea_mays.B73_RefGen_v4.dna.toplevel.fa.gz) was downloaded from ftp://ftp.gramene.org/pub/gramene/CURRENT_RELEASE/fasta/zea_mays/dna/
@@ -33,21 +35,28 @@ done
 bamqc *.bam
 
 # Filtering, only reads with MAPQ score at least 10 were retained
-for i in {4..39};
+for i in {4..29};
 do samtools view -@24 -bq10 bbd4${i}.bam -o bb${i}q10_4.bam;
 done
 
 # Removal of reads mapping to organellar DNA
 # This step first recode binary alignment file (bam) to human-readable form (sam), next rows with reads mapping to mitochondrion "Mt" or plastid "Pt" were removed.
 # Finally file was recoded to binary form and temporary files were removed.
-for i in {4..39};
+for i in {4..29};
 do samtools view -@24 -h bb${i}q10_4.bam > x.sam && sed '/Mt/d;/Pt/d' x.sam > x2.sam && samtools view -@24 -b x2.sam > bb${i}q10_4.bam && rm x.sam x2.sam; 
 done
 
 # Sorting and indexing
-for i in {4..39};
+for i in {4..29};
 do samtools sort -@24 -o bb${i}q10_4srt.bam bb${i}q10_4.bam -O bam -T temp && samtools index -@24 bb${i}q10_4srt.bam;
 done
 
 # Quality control with bamqc
 
+# Removal od duplicates (picard tools)
+# installation under Ubuntu 18.04.5 LTS
+sudo apt-get install picard-tools
+
+for i in {4..29}; do PicardCommandLine MarkDuplicates I=bb${i}q10_4srt.bam O=bb${i}q10_4nodup.bam M=marked_bb${i}q10_4.txt READ_NAME_REGEX='HISEQ:([0-9]+):[a-zA-Z0-9]+:([0-9]+):([0-9]+):([0-9]+):([0-9]+) ([0-9]+):([A-Z]+):([0-9]+):([ACGTN]+)' REMOVE_DUPLICATES=true; done
+
+# Peak-calling TU BEDZIE WYBRANA METODA LUB METODY, JESLI BEDE WYBIERAL WSPOLNE DLA KILKU PROGRAMOW
