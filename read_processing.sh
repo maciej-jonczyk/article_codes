@@ -55,7 +55,7 @@ done
 
 # Removal od duplicates (picard tools)
 # installation under Ubuntu 18.04.5 LTS
-sudo apt-get install picard-tools
+sudo apt-get install picard-tools # version 2.8.1
 
 for i in {4..29}; do PicardCommandLine MarkDuplicates I=bb${i}q10_4srt.bam O=bb${i}q10_4nodup.bam M=marked_bb${i}q10_4.txt READ_NAME_REGEX='HISEQ:([0-9]+):[a-zA-Z0-9]+:([0-9]+):([0-9]+):([0-9]+):([0-9]+) ([0-9]+):([A-Z]+):([0-9]+):([ACGTN]+)' REMOVE_DUPLICATES=true; done
 
